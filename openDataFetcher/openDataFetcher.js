@@ -21,18 +21,18 @@ exports.getCologneDataset = (name, callback) => {
 function getCologneSubDatasets() {
     return new Promise((resolve, reject)=>{
         getCologneMainDatasets().then(function(response) {
-            let combinedDatasets = [];
+            var combinedDatasets = [];
             response.forEach(element => {
                 let serviceName = element.name;
                 let serviceTyp = element.type;
-                request(cologneData_root + '/' + serviceName + '/' +  serviceTyp + format_string, function (error, response, body) {
-                    if (response.statusCode == 200) {
+                request(cologneData_root + '/' + serviceName + '/' +  serviceTyp + format_string, function (error, res, body) {
+                    if (res.statusCode == 200) {
                         body = JSON.parse(body);
                         let layers = body.layers;
                         var layerArray = [];
                         layers.forEach(element => {
-                            let layerID = layers.id;
-                            let layerName = layers.name;
+                            let layerID = element.id;
+                            let layerName = element.name;
                             let layerObject = {
                                 "id": layerID,
                                 "name": layerName
@@ -45,12 +45,18 @@ function getCologneSubDatasets() {
                         }
                         combinedDatasets.push(datasetObject);
 
+                        console.log(combinedDatasets.length + '  ' + response.length);
+                        if (combinedDatasets.length == response.length) {
+                            resolve(combinedDatasets);
+                        }
+
                     } else {
                         reject(error)
                     }
                 });
+
             });
-            resolve(combinedDatasets);
+
           }, function(error) {
             reject(error);
           })
@@ -70,7 +76,6 @@ function getCologneMainDatasets() {
                     goodServices.push(element);
                 }
             });
-            console.log(goodServices);
             resolve(goodServices);
         } else {
             reject(error);

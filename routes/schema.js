@@ -1,5 +1,6 @@
 
 const express = require("express");
+const util = require('util');
 const schema = express.Router();
 const vocabulary = require('../vocabulary/vocabulary');
 const openDataFetcher = require('../openDataFetcher/openDataFetcher')
@@ -16,6 +17,6 @@ schema.get('/:name', (req, res) => {
     })
 });
 
-openDataFetcher.getCologneDatasetsList(function(body) {console.log(body)});
+openDataFetcher.getCologneDatasetsList(function(body) {console.log(util.inspect(body, {showHidden: false, depth: null}))});
 
 module.exports = schema;
