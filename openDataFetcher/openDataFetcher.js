@@ -1,7 +1,7 @@
-const request = require('request')
+const request = require('request');
 
-var cologneData_root = 'https://geoportal.stadt-koeln.de/arcgis/rest/services/'
-var format_string = '?f=pjson'
+var cologneData_root = 'https://geoportal.stadt-koeln.de/arcgis/rest/services/';
+var format_string = '?f=pjson';
 
 exports.getCologneDatasetsList = (callback) => {
 
@@ -44,14 +44,12 @@ function getCologneSubDatasets() {
                             "layer": layerArray
                         }
                         combinedDatasets.push(datasetObject);
-
-                        console.log(combinedDatasets.length + '  ' + response.length);
                         if (combinedDatasets.length == response.length) {
                             resolve(combinedDatasets);
                         }
 
                     } else {
-                        reject(error)
+                        reject(error);
                     }
                 });
 

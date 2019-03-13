@@ -3,7 +3,7 @@ const jsonPath = require('jsonpath');
 const cheerio = require('cheerio');
 const schemaOrgUrl = 'https://schema.org';
 
-exports.getVocabularyMeta = (name, callback) => {
+exports.getSchemaMeta = (name, callback) => {
     const options = {
         uri: schemaOrgUrl + '/docs/tree.jsonld',
         method: 'get',
@@ -22,7 +22,7 @@ exports.getVocabularyMeta = (name, callback) => {
     });
 }
 
-exports.getVocabulary = (name, callback) => {
+exports.getSchema = (name, callback) => {
     const options = {
         uri: schemaOrgUrl + '/' + name,
         method: 'get',
