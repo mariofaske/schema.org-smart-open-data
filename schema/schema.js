@@ -22,6 +22,25 @@ exports.getSchemaMeta = (name, callback) => {
     });
 }
 
+exports.getSchemaMetaNames = (callback) => {
+    const options = {
+        uri: schemaOrgUrl + '/docs/tree.jsonld',
+        method: 'get',
+        headers: {
+            accept: 'application/json'
+        }
+    }
+    request(options, function (err, res, body) {
+        if (res.statusCode == 200) {
+            let result = JSON.parse(body);
+            result = jsonPath.query(result, '$..["name"]');
+            callback(result);
+        } else {
+            callback({ error: `${options.uri} not responding` });
+        }
+    });
+}
+
 exports.getSchema = (name, callback) => {
     const options = {
         uri: schemaOrgUrl + '/' + name,

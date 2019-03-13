@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const db = require('./utils/db');
 const dotenv = require('dotenv').config();
+const routineScheduler = require('./openDataParser/openDataParser');
 
 // configure port, process.env.PORT for deployment
 const settings = {
@@ -33,6 +34,7 @@ db.connect(process.env.DATABASE, function (err) {
         app.listen(settings.port, () => {
             console.log(`Server listening on port: ${settings.port}`);
         });
+        routineScheduler.executeRoutine();
     }
 });
 
