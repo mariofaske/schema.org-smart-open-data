@@ -4,7 +4,10 @@ const openDataFetcher = require('../../openDataFetcher/openDataFetcher');
 
 // GET request on all portals, optional filter on portal attributes
 portals.get('/', (req, res) => {
-    openDataFetcher.getCologneDatasetsList((result) => {
+/*     openDataFetcher.getCologneDatasetsList((result) => {
+        res.status(200).json(result);
+    }); */
+    openDataFetcher.getDatasetsList((result) => {
         res.status(200).json(result);
     });
 });
