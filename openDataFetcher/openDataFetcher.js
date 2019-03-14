@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 
 var cologneData_root = 'https://geoportal.stadt-koeln.de/arcgis/rest/services/';
 var cologne_format_string = '?f=pjson';
+var cologne_queryString = "&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=4326&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&resultOffset=&resultRecordCount=&queryByDistance=&returnExtentsOnly=false&datumTransformation=&parameterValues=&rangeValues=&f=geojson";
 
 var nycData_root_html = "https://data.cityofnewyork.us/browse?sortBy=most_accessed";
 var nycData_root_api = "https://data.cityofnewyork.us/resource/";
@@ -13,33 +14,36 @@ var cologneObjects = [];
 
 exports.getDatasetsList = async (callback) => {
     let response = await getDatasets();
-    let datasetString = ["Karnevalskarte:Rosenmontagszug"];
-    for (const iterator of cologneObjects) {
-        if(Object.keys(iterator)[0] == datasetString[0])
-        console.log(Object.values(iterator));
-    }
 
 
     callback(response);
 }
-
+// This function gets the requested dataset from the specific portal
 exports.getDataset = async (portal, requestedDataset, callback) => {
-    let dataset;
-
     switch (portal) {
         case "ODCologne":
             let datasetString = requestedDataset.split(":");
-            for (const iterator of cologneObjects) {
-                if(iterator[datasetString[1]] == datasetString[1] ){
-
+            let datasetID = await new Promise((resolve, reject) => {
+                for (const iterator of cologneObjects) {
+                    //console.log(`${splitIterator[1]}     +     ${datasetString[1]}`);
+                    if(Object.keys(iterator)[0] == requestedDataset) {
+                        resolve(Object.values(iterator));
+                    }
                 }
-            }
-            let obj = await cologneObjects.find(obj => obj.datasetString[1] == datasetString[1]);
-            let responseHTML = await fetch(cologneData_root + datasetString[0] + "/" + "MapServer" + "/" + cologneObjects[datasetString[1]])
-                .then(res => res.text())
-                .then(body => {
-                    return body
+            });
+            // fetch the description of the dataset as json
+            let responseJSON = await fetch(`${cologneData_root}${datasetString[0]}/MapServer/${datasetID}/${cologne_format_string}`)
+                .then(res => res.json())
+                .then(json => {
+                    return json
                 });
+            // fetch specific dataset
+            dataset = await fetch(`${cologneData_root}${datasetString[0]}/MapServer/${datasetID}/query?where=${responseJSON.fields[0].name}+is+not+null${cologne_queryString}`)
+                .then(res => res.json())
+                .then(json => {
+                    return json
+                });
+            callback(dataset);
             break;
         case "ODNYC":
 
