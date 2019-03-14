@@ -25,8 +25,7 @@ exports.getDataset = async (portal, requestedDataset, callback) => {
             let datasetString = requestedDataset.split(":");
             let datasetID = await new Promise((resolve, reject) => {
                 for (const iterator of cologneObjects) {
-                    //console.log(`${splitIterator[1]}     +     ${datasetString[1]}`);
-                    if(Object.keys(iterator)[0] == requestedDataset) {
+                    if (Object.keys(iterator)[0] == requestedDataset) {
                         resolve(Object.values(iterator));
                     }
                 }
@@ -46,7 +45,21 @@ exports.getDataset = async (portal, requestedDataset, callback) => {
             callback(dataset);
             break;
         case "ODNYC":
-
+            let datasetURL = await new Promise((resolve, reject) => {
+                for (const iterator of nycObjects) {
+                    if (Object.keys(iterator)[0] == requestedDataset) {
+                        resolve(Object.values(iterator));
+                    }
+                }
+            });
+            let datasetHMTL = await fetch(datasetURL)
+                .then(res => res.text())
+                .then(body => {
+                    return body
+                });
+            let $1 = cheerio.load(datasetHMTL);
+            console.log($1('#app').find('#data-id').attr('href'));
+            //console.log($1('.entry-actions .btn-group').find('a.option').attr('data-id'));
             break;
 
         default:
@@ -81,7 +94,7 @@ async function getNYCDatasetsList() {
             return body
         });
     let $ = cheerio.load(responseHTML);
-    $('.browse2-results .browse2-result').each(async (i, elem) => {
+    $('.browse2-results .browse2-result').each((i, elem) => {
         if ($(elem).find('.browse2-result-type-name').text().includes("Dataset")) {
             let datasetName = $(elem).find('.browse2-result-name-link').text();
             let datasetURL = $(elem).find('a.browse2-result-name-link').attr('href');
