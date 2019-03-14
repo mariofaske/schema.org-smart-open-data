@@ -9,14 +9,45 @@ var nycData_root_html = "https://data.cityofnewyork.us/browse?sortBy=most_access
 var nycData_root_api = "https://data.cityofnewyork.us/resource/";
 
 var nycObjects = [];
+var cologneObjects = [];
 
 exports.getDatasetsList = async (callback) => {
     let response = await getDatasets();
+    let datasetString = ["Karnevalskarte:Rosenmontagszug"];
+    for (const iterator of cologneObjects) {
+        if(Object.keys(iterator)[0] == datasetString[0])
+        console.log(Object.values(iterator));
+    }
+
+
     callback(response);
 }
 
-exports.getDataset = async (portal, dataset, callback) => {
-    //if(portal.includes("ODCologne"))
+exports.getDataset = async (portal, requestedDataset, callback) => {
+    let dataset;
+
+    switch (portal) {
+        case "ODCologne":
+            let datasetString = requestedDataset.split(":");
+            for (const iterator of cologneObjects) {
+                if(iterator[datasetString[1]] == datasetString[1] ){
+
+                }
+            }
+            let obj = await cologneObjects.find(obj => obj.datasetString[1] == datasetString[1]);
+            let responseHTML = await fetch(cologneData_root + datasetString[0] + "/" + "MapServer" + "/" + cologneObjects[datasetString[1]])
+                .then(res => res.text())
+                .then(body => {
+                    return body
+                });
+            break;
+        case "ODNYC":
+
+            break;
+
+        default:
+            break;
+    }
 }
 
 async function getDatasets() {
@@ -51,7 +82,7 @@ async function getNYCDatasetsList() {
             let datasetName = $(elem).find('.browse2-result-name-link').text();
             let datasetURL = $(elem).find('a.browse2-result-name-link').attr('href');
             let datasetID = datasetURL.split('/');
-            nycObjects.push({ [datasetName]: datasetURL});
+            nycObjects.push({ [datasetName]: datasetURL });
             datasetsArray.push(datasetName)
         }
     });
@@ -71,6 +102,7 @@ async function getCologneSubDatasetsList(mainDatasets) {
 
         for (const iterator of layers) {
             let layerName = iterator.name;
+            cologneObjects.push({ [serviceName + ":" + layerName]: iterator.id });
             datasetsArray.push(serviceName + ":" + layerName);
         }
     }
