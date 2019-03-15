@@ -17,6 +17,9 @@ app.use(helmet());
 // enable bodyParser middleware on all routes
 app.use(bodyParser.json());
 
+// defines routes to htmls
+app.use(express.static('./public'));
+
 // defines routes to resources
 app.use('/portals', require('./routes/portals/portals'));
 app.use('/types', require('./routes/types/types'));
