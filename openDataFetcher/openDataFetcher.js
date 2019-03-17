@@ -2,10 +2,12 @@ const request = require('request');
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
 
+var cologne_od_name = 'Offene Daten Köln';
 var cologneData_root = 'https://geoportal.stadt-koeln.de/arcgis/rest/services/';
 var cologne_format_string = '?f=pjson';
 var cologne_queryString = "&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=4326&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&resultOffset=&resultRecordCount=&queryByDistance=&returnExtentsOnly=false&datumTransformation=&parameterValues=&rangeValues=&f=geojson";
 
+var nyc_od_name = 'NYC OpenData';
 var nycData_root_html = "https://data.cityofnewyork.us/browse?sortBy=most_accessed";
 var nycData_root_api = "https://data.cityofnewyork.us/resource/";
 
@@ -14,14 +16,13 @@ var cologneObjects = [];
 
 exports.getDatasetsList = async (callback) => {
     let response = await getDatasets();
-
-
     callback(response);
 }
-// This function gets the requested dataset from the specific portal
+
+// gets the requested dataset from the specific portal
 exports.getDataset = async (portal, requestedDataset, callback) => {
     switch (portal) {
-        case "ODCologne":
+        case cologne_od_name:
             let datasetString = requestedDataset.split(":");
             let datasetID = await new Promise((resolve, reject) => {
                 for (const iterator of cologneObjects) {
@@ -44,7 +45,7 @@ exports.getDataset = async (portal, requestedDataset, callback) => {
                 });
             callback(dataset);
             break;
-        case "ODNYC":
+        case nyc_od_name:
             let datasetURL = await new Promise((resolve, reject) => {
                 for (const iterator of nycObjects) {
                     if (Object.keys(iterator)[0] == requestedDataset) {
@@ -73,25 +74,21 @@ exports.getDataset = async (portal, requestedDataset, callback) => {
 }
 
 async function getDatasets() {
-
     let cologneMainDatasetsList = await getCologneMainDatasetsList();
 
     let cologneSubDatasetsList = await getCologneSubDatasetsList(cologneMainDatasetsList);
 
     let nycDatasetsList = await getNYCDatasetsList();
 
-
     let datasetsObject = {
-        "Offene Daten Köln": cologneSubDatasetsList,
-        "NYC OpenData": nycDatasetsList
+        [cologne_od_name]: cologneSubDatasetsList,
+        [nyc_od_name]: nycDatasetsList
     }
 
     return datasetsObject;
-
 }
 
 async function getNYCDatasetsList() {
-
     let datasetsArray = [];
     let responseHTML = await fetch(nycData_root_html)
         .then(res => res.text())

@@ -47,16 +47,13 @@ function delay(callback, ms) {
 // input filter logic
 $('#inputLarge').keyup(delay(function (event) {
     if (event.which != '13') {
-        let cols = document.getElementsByClassName("col");
-        for (let i = 0; i < cols.length; i++) {
-            let cardTitle = cols[i].getElementsByClassName('card-title');
-            for (let j = 0; j < cardTitle.length; j++) {
-                let cardValue = cardTitle[j].innerText;
-                if (cardValue.includes($('#inputLarge').val())) {
-                    cols[i].style.display = "";
-                } else {
-                    cols[i].style.display = "none";
-                }
+        let cardTitle = document.getElementsByClassName('card-title');
+        for (let i = 0; i < cardTitle.length; i++) {
+            let cardValue = cardTitle[i].innerText;
+            if (cardValue.includes($('#inputLarge').val())) {
+                cardTitle[i].parentElement.parentElement.style.display = "";
+            } else {
+                cardTitle[i].parentElement.parentElement.style.display = "none";
             }
         }
     }
