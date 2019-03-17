@@ -57,9 +57,14 @@ exports.getDataset = async (portal, requestedDataset, callback) => {
                 .then(body => {
                     return body
                 });
-            let $1 = cheerio.load(datasetHMTL);
-            console.log($1('#app').find('#data-id').attr('href'));
-            //console.log($1('.entry-actions .btn-group').find('a.option').attr('data-id'));
+            let textMatch = datasetHMTL.toString().match(/apiFoundryUrl":"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/);
+            let splittedID = textMatch[0].split("/");
+            let datasetJSON = await fetch(`${nycData_root_api}${splittedID[splittedID.length - 1]}`)
+                .then(res => res.json())
+                .then(json => {
+                    return json
+                });
+            callback(datasetJSON);
             break;
 
         default:
