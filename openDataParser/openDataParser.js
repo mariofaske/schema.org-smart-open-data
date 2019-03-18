@@ -1,4 +1,6 @@
 const dataTypeMapper = require('../nlp/dataTypeMapper');
+const traverse = require('traverse');
+
 
 exports.executeRoutine = () => {
     // sample use case with 'Coordinate', expected match: 'GeoCoordinates'
@@ -62,23 +64,18 @@ exports.executeRoutine = () => {
         ]
     };
 
-    function process(key, value) {
-        dataTypeMapper.findMatchingType(key, (matchedType) => {
-            if (matchedType.bestMatch) {
-                console.log(matchedType.bestMatch);
-            }
-        });
-    }
+    function access(obj, key) { return obj[key] }
 
-    function traverseJsonNodes(jsonObj, func) {
-        for (var i in jsonObj) {
-            func.apply(this, [i, jsonObj[i]]);
-            if (jsonObj[i] !== null && typeof (jsonObj[i]) == "object") {
-                traverseJsonNodes(jsonObj[i], func);
-            }
+    traverse(sampleJSON).forEach(function () {
+        if (isNaN(this.key) && this.key != undefined) {
+            dataTypeMapper.findMatchingType(this.key, (matchedType) => {
+                if (matchedType.bestMatch) {
+                    parentPath = this.path.slice(0, this.path.length - 1);
+                    parentPath.reduce(access, sampleJSON)['@type'] = matchedType.bestMatch;
+                    console.log(sampleJSON['features']['0']['geometry']);
+                }
+            });
         }
-    }
-
-    traverseJsonNodes(sampleJSON, process);
+    });
 
 }
