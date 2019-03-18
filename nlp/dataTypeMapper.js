@@ -6,7 +6,7 @@ exports.findMatchingType = (type, callback) => {
     db.collection("mappings").findOne({ "type": type }, (err, match) => {
         if (match) {
             // return match if type already matched in database
-            callback(match.match);
+            callback({'bestMatch':match.match});
         } else {
             schema.getSchemaMetaNames((result) => {
                 if (result.error) {
@@ -23,7 +23,7 @@ exports.findMatchingType = (type, callback) => {
                     // accept bestMatch only if string distance is greater or equal 0.85
                     if (bestMatch >= 0.85) {
                         db.collection("mappings").insertOne({ "type": type, "match": result[indexBestMatch] }, (err, match) => {
-                            callback(result[indexBestMatch]);
+                            callback({'bestMatch':result[indexBestMatch]});
                         });
                     } else {
                         // return original type if no match is found
