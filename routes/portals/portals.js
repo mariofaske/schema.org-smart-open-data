@@ -7,7 +7,7 @@ const moment = require('moment');
 // GET request on all portals
 portals.get('/', (req, res) => {
     db.collection('datasetslist').findOne({}, (err, result) => {
-        if(req.query.viewMode) return res.status(200).json(result.portals);
+        if (req.query.viewMode) return res.status(200).json(result.portals);
         res.status(200).json(Object.keys(result.portals));
     });
 });
@@ -22,15 +22,15 @@ portals.get('/:portal', (req, res) => {
 // GET request on a specific dataset of a specific portal
 portals.get('/:portal/:dataset', (req, res) => {
     //todo: specify query
-    db.collection('datasets').findOne({}, (err, result) => {
+    db.collection(req.params.portal).findOne({ name: req.params.dataset }, (err, result) => {
         // if dataset older than 14 days fetch via openDataParser
-        if (moment().diff(moment(result.lastModified), 'days') >= 14) {
-            let response = openDataParser.getSchematizedDataset(req.params.portal, req.params.dataset);
-            res.status(200).json({ [req.params.portal]: response[req.params.portal] });
+        if ((result && moment().diff(moment(result.lastModified), 'days') >= 14) || !result) {
+            openDataParser.getSchematizedDataset(req.params.portal, req.params.dataset, (result) => {
+                res.status(200).json({ [req.params.portal]: result });
+            });
         } else {
             res.status(200).json({ [req.params.portal]: result.portals[req.params.portal] });
         }
     });
 });
-
 module.exports = portals;

@@ -34,7 +34,7 @@ exports.getSchemaMetaNames = (callback) => {
         if (res.statusCode == 200) {
             let result = JSON.parse(body);
             result = jsonPath.query(result, '$..["name"]');
-            callback(result);
+            callback({result:result});
         } else {
             callback({ error: `${options.uri} not responding` });
         }

@@ -8,10 +8,11 @@ exports.findMatchingType = (type, callback) => {
             // return match if type already matched in database
             callback({ 'bestMatch': match.match });
         } else {
-            schema.getSchemaMetaNames((result) => {
+            db.collection('schemametanames').findOne({}, (err, result)=>{
                 if (result.error) {
                     callback(result.error);
                 } else {
+                    result = result.result;
                     let indexBestMatch = 0;
                     let bestMatch = nlp.JaroWinklerDistance(result[indexBestMatch], type);
                     result.forEach((element, i) => {

@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const db = require('./utils/db');
 const dotenv = require('dotenv').config();
 const routineScheduler = require('./openDataParser/openDataParser');
+const schema = require('./schema/schema');
 const schedule = require('node-schedule');
 
 // configure port, process.env.PORT for deployment
@@ -38,6 +39,13 @@ db.connect(process.env.DATABASE, function (err) {
         app.listen(settings.port, () => {
             console.log(`Server listening on port: ${settings.port}`);
         });
+        schema.getSchemaMetaNames((result)=>{
+            db.collection('schemametanames').findOneAndReplace({},result,{upsert:true}, (err, result)=>{
+                if(err) console.log(err);
+            })
+        });
+        // execute routine at server start
+        routineScheduler.executeRoutine();
         // execute routine every 24 hours at midnight
         schedule.scheduleJob('0 0 * * *', function(){
             routineScheduler.executeRoutine();

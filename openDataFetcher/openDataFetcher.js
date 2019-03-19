@@ -2,12 +2,12 @@ const request = require('request');
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
 
-var cologne_od_name = 'Offene Daten Köln';
+var cologne_od_name = 'od_cologne';
 var cologneData_root = 'https://geoportal.stadt-koeln.de/arcgis/rest/services/';
 var cologne_format_string = '?f=pjson';
 var cologne_queryString = "&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=4326&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&resultOffset=&resultRecordCount=&queryByDistance=&returnExtentsOnly=false&datumTransformation=&parameterValues=&rangeValues=&f=geojson";
 
-var nyc_od_name = 'NYC OpenData';
+var nyc_od_name = 'od_nyc';
 var nycData_root_html = "https://data.cityofnewyork.us/browse?sortBy=most_accessed";
 var nycData_root_api = "https://data.cityofnewyork.us/resource/";
 
@@ -69,6 +69,7 @@ exports.getDataset = async (portal, requestedDataset, callback) => {
             break;
 
         default:
+            console.log("NIX GEFUNDEN");
             break;
     }
 }

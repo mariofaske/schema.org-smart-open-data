@@ -12,22 +12,37 @@ exports.executeRoutine = () => {
     });
 }
 
-exports.getSchematizedDataset = (portal, dataset) => {
-    openDataFetcher.getDataset(portal, dataset, (result) => {
-        let openDataDataset = result;
+exports.getSchematizedDataset = async (portal, dataset, callback) => {
+    openDataFetcher.getDataset(portal, dataset, async (result) => {
+        let openDataDataset = await traverseData(result);
+        callback(openDataDataset);
+    });
+
+}
+
+function traverseData(openDataDataset) {
+    return new Promise((resolve, reject) => {
+        let counter = 0;
+        let difference = 0;
+        let traverseLength = traverse(openDataDataset).nodes().length;
         traverse(openDataDataset).forEach(function () {
             if (isNaN(this.key) && this.key != undefined) {
+                difference = traverseLength--;
                 dataTypeMapper.findMatchingType(this.key, (matchedType) => {
                     if (matchedType.bestMatch) {
                         parentPath = this.path.slice(0, this.path.length - 1);
                         parentPath.reduce(access, openDataDataset)['@type'] = matchedType.bestMatch;
+                        counter++;
+                    }
+                    counter++
+                    if (traverse(openDataDataset).nodes().length == counter + difference) {
+                        resolve(openDataDataset);
                     }
                 });
             }
+
         });
-        return openDataDataset;
-    });
-
-    function access(obj, key) { return obj[key] }
-
+    })
 }
+
+function access(obj, key) { return obj[key] }
