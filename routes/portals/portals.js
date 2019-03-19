@@ -29,7 +29,7 @@ portals.get('/:portal/:dataset', (req, res) => {
                 res.status(200).json({ [req.params.portal]: result });
             });
         } else {
-            res.status(200).json({ [req.params.portal]: result.portals[req.params.portal] });
+            res.status(200).json({ [req.params.portal]: result });
         }
     });
 });

@@ -15,6 +15,9 @@ exports.executeRoutine = () => {
 exports.getSchematizedDataset = async (portal, dataset, callback) => {
     openDataFetcher.getDataset(portal, dataset, async (result) => {
         let openDataDataset = await traverseData(result);
+        db.collection(portal).insertOne({ name: dataset, lastModified: new Date(), dataset: openDataDataset }, (err, result) => {
+            if (err) console.log(err);
+        });
         callback(openDataDataset);
     });
 
