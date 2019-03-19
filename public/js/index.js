@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $('#inputLarge').attr("placeholder", "Loading datasets...");
     $('#inputLarge').prop("disabled", true);
-    $.get('http://localhost:3000/portals', function (response) {
+    $.get('http://localhost:3000/portals?viewMode=web', function (response) {
         let html = '<div class="row">';
         for (let odPortal in response) {
             if (!response.hasOwnProperty(odPortal)) continue;
